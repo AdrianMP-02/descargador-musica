@@ -1,3 +1,7 @@
 .agent/
 dist/
+build/
 downloads/
+*.spec
+__pycache__/
+*.pyc
