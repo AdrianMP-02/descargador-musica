@@ -1,14 +1,6 @@
 import requests
 import os
 import sys
-import logging
-
-# Configure logging to a file
-logging.basicConfig(
-    filename='app_debug.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
 class Updater:
     def __init__(self, repo_owner, repo_name, current_version):
@@ -23,28 +15,19 @@ class Updater:
     def check_for_updates(self):
         """Checks GitHub for a newer version"""
         try:
-            logging.info(f"Checking for updates at {self.api_url}")
             response = requests.get(self.api_url, headers=self.headers, timeout=10)
-            logging.info(f"GitHub API response status: {response.status_code}")
             
             if response.status_code == 200:
                 latest_release = response.json()
                 latest_version = latest_release.get('tag_name')
-                logging.info(f"Latest version found: {latest_version} (Current: {self.current_version})")
                 
                 if latest_version and latest_version != self.current_version:
-                    logging.info("Update found!")
                     return {
                         'new_version': latest_version,
                         'download_url': self._get_exe_download_url(latest_release),
                         'release_notes': latest_release.get('body', '')
                     }
-                else:
-                    logging.info("No new version available.")
-            else:
-                logging.error(f"Failed to check updates. Status: {response.status_code}, Body: {response.text[:100]}")
         except Exception as e:
-            logging.error(f"Error checking updates: {str(e)}")
             print(f"Error checking updates: {e}")
         return None
 
@@ -55,6 +38,30 @@ class Updater:
             if asset.get('name', '').lower().endswith('.exe'):
                 return asset.get('browser_download_url')
         return None
+
+    def download_file(self, url, callback=None):
+        """Downloads the file with progress feedback"""
+        try:
+            response = requests.get(url, headers=self.headers, stream=True, timeout=30)
+            response.raise_for_status()
+            
+            total_size = int(response.headers.get('content-length', 0))
+            downloaded_size = 0
+            
+            filename = "DescargadorFacil_Nuevo.exe"
+            with open(filename, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+                        if callback and total_size > 0:
+                            progress = downloaded_size / total_size
+                            callback(progress)
+            
+            return filename
+        except Exception as e:
+            print(f"Error during download: {e}")
+            return None
 
     def download_and_install(self, download_url):
         """

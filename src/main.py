@@ -6,7 +6,7 @@ import os
 # Configuration
 REPO_OWNER = "AdrianMP-02"
 REPO_NAME = "descargador-musica"
-CURRENT_VERSION = "v1.3.0"
+CURRENT_VERSION = "v2026.02.13.200440"
 
 def main(page: ft.Page):
     page.title = "Descargador de Música y Vídeo"
@@ -147,6 +147,27 @@ def main(page: ft.Page):
     # Check for updates on startup
     update_info = updater.check_for_updates()
     if update_info:
+        def start_update(e):
+            page.banner.actions = [ft.Text("Descargando...")]
+            page.update()
+            
+            def update_progress(p):
+                page.banner.content = ft.Text(f"Descargando actualización: {int(p*100)}%")
+                page.update()
+
+            downloaded_file = updater.download_file(update_info['download_url'], update_progress)
+            
+            if downloaded_file:
+                page.banner.bgcolor = ft.Colors.GREEN_100
+                page.banner.leading = ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN, size=40)
+                page.banner.content = ft.Text(f"✅ Descargado: {downloaded_file}. Ejecútalo para instalar la nueva versión.", color=ft.Colors.BLACK)
+                page.banner.actions = [ft.TextButton("Entendido", on_click=lambda _: close_banner(None))]
+            else:
+                page.banner.bgcolor = ft.Colors.RED_100
+                page.banner.content = ft.Text("❌ Error al descargar la actualización.", color=ft.Colors.BLACK)
+                page.banner.actions = [ft.TextButton("Reintentar", on_click=start_update), ft.TextButton("Cerrar", on_click=close_banner)]
+            page.update()
+
         def close_banner(e):
             page.banner.open = False
             page.update()
@@ -156,7 +177,7 @@ def main(page: ft.Page):
             leading=ft.Icon(ft.Icons.UPGRADE, color=ft.Colors.AMBER, size=40),
             content=ft.Text(f"¡Hay una nueva versión disponible! ({update_info['new_version']})", color=ft.Colors.BLACK),
             actions=[
-                ft.TextButton(content=ft.Text("Actualizar ahora"), on_click=lambda _: page.launch_url(update_info['download_url'])),
+                ft.TextButton(content=ft.Text("Actualizar ahora"), on_click=start_update),
                 ft.TextButton(content=ft.Text("Cerrar"), on_click=close_banner),
             ],
         )
