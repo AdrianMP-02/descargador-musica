@@ -1,0 +1,4 @@
+flet[all]
+yt-dlp
+requests
+pyinstaller
