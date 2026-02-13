@@ -1,15 +1,32 @@
 import yt_dlp
 import os
+import sys
+
+def get_base_path():
+    """Returns the base path for resources, handles PyInstaller's --onefile mode"""
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class Downloader:
     def __init__(self, download_path="Musica Descargada"):
         self.download_path = download_path
         if not os.path.exists(self.download_path):
             os.makedirs(self.download_path)
+            
+        # Detect FFmpeg location
+        base_path = get_base_path()
+        self.ffmpeg_path = os.path.join(base_path, "bin")
+        if not os.path.exists(os.path.join(self.ffmpeg_path, "ffmpeg.exe")):
+            # Fallback to current working directory or system PATH
+            self.ffmpeg_path = None
 
     def get_info(self, url):
         """Retrieves video information without downloading"""
         ydl_opts = {}
+        if self.ffmpeg_path:
+            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
+            
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return {
@@ -31,6 +48,9 @@ class Downloader:
             }],
             'progress_hooks': progress_hooks or [],
         }
+        if self.ffmpeg_path:
+            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
@@ -42,6 +62,9 @@ class Downloader:
             'outtmpl': os.path.join(self.download_path, '%(title)s.%(ext)s'),
             'progress_hooks': progress_hooks or [],
         }
+        if self.ffmpeg_path:
+            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
