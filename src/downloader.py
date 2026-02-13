@@ -2,7 +2,7 @@ import yt_dlp
 import os
 
 class Downloader:
-    def __init__(self, download_path="downloads"):
+    def __init__(self, download_path="Musica Descargada"):
         self.download_path = download_path
         if not os.path.exists(self.download_path):
             os.makedirs(self.download_path)

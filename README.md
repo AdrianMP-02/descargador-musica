@@ -23,11 +23,11 @@ git remote add origin https://github.com/AdrianMP-02/descargador-musica.git
 git push -u origin main
 ```
 
-1. Abre la aplicación `DescargadorFacil.exe`.
+1. Abre la aplicación `Descargador-Musica.exe`.
 2. Copia el enlace del vídeo de YouTube que quieras descargar.
 3. Pégalo en el cuadro de texto central.
 4. Haz clic en el botón rojo **"Escuchar (MP3)"** si quieres la canción, o en el botón azul **"Ver (MP4)"** si quieres el vídeo.
-5. ¡Listo! El archivo se guardará en la carpeta `downloads` junto al programa.
+5. ¡Listo! El archivo se guardará en la carpeta `Musica Descargada` junto al programa.
 
 ## Desarrollo con Docker
 
@@ -48,6 +48,6 @@ Para crear el ejecutable de Windows (ejecutar en un entorno Windows):
 
 ```bash
 pip install -r requirements.txt
-python -m PyInstaller --noconsole --onefile --name "DescargadorFacil" --add-data "src;src" src/main.py
+python -m PyInstaller --noconsole --onefile --name "Descargador-Musica" --add-data "src;src" src/main.py
 ```
 

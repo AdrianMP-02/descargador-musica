@@ -29,7 +29,7 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          python -m PyInstaller --noconsole --onefile --name "DescargadorFacil" --add-data "src;src" src/main.py
+          python -m PyInstaller --noconsole --onefile --name "Descargador-Musica" --add-data "src;src" src/main.py
 
       - name: Get current date for tag
         id: date
@@ -41,7 +41,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'push'
         with:
           tag_name: ${{ github.ref_name == 'main' && format('v{0}', steps.date.outputs.date) || github.ref_name }}
-          files: dist/DescargadorFacil.exe
+          files: dist/Descargador-Musica.exe
           name: Release ${{ github.ref_name == 'main' && steps.date.outputs.date || github.ref_name }}
           draft: false
           prerelease: false
