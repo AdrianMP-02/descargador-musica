@@ -6,7 +6,7 @@ import os
 # Configuration
 REPO_OWNER = "AdrianMP-02"
 REPO_NAME = "descargador-musica"
-CURRENT_VERSION = "v1.0.0"
+CURRENT_VERSION = "v1.3.0"
 
 def main(page: ft.Page):
     page.title = "Descargador de Música y Vídeo"
@@ -128,7 +128,7 @@ def main(page: ft.Page):
         ft.Column(
             controls=[
                 ft.Icon(ft.Icons.ONDEMAND_VIDEO_ROUNDED, size=80, color=ft.Colors.RED_400),
-                ft.Text("Descargador Fácil", size=32, weight=ft.FontWeight.BOLD),
+                ft.Text("Descargador Musica", size=32, weight=ft.FontWeight.BOLD),
                 ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
                 url_input,
                 ft.Divider(height=10, color=ft.Colors.TRANSPARENT),
