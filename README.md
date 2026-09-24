@@ -29,6 +29,12 @@ git push -u origin main
 4. Haz clic en el botón rojo **"Escuchar (MP3)"** si quieres la canción, o en el botón azul **"Ver (MP4)"** si quieres el vídeo.
 5. ¡Listo! El archivo se guardará en la carpeta `Musica Descargada` junto al programa.
 
+### Si algún vídeo no descarga (verificación de YouTube)
+
+YouTube cambia con frecuencia cómo protege sus vídeos, lo que a veces hace que `yt-dlp` deje de funcionar hasta que se actualiza. Este proyecto ya usa la versión más reciente de `yt-dlp` (sin fijar una versión concreta en `requirements.txt`) y prueba varios "clientes" de YouTube automáticamente para esquivar estos bloqueos.
+
+Si aun así algún vídeo pide iniciar sesión o da error de verificación, puedes crear un archivo `cookies.txt` (formato Netscape, exportado con una extensión del navegador como "Get cookies.txt") en la misma carpeta que `Descargador-Musica.exe`. La app lo detectará automáticamente y lo usará para autenticarse.
+
 ## Desarrollo con Docker
 
 Si eres desarrollador y quieres modificar la app:

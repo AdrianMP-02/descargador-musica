@@ -13,7 +13,7 @@ class Downloader:
         self.download_path = download_path
         if not os.path.exists(self.download_path):
             os.makedirs(self.download_path)
-            
+
         # Detect FFmpeg location
         base_path = get_base_path()
         self.ffmpeg_path = os.path.join(base_path, "bin")
@@ -21,12 +21,34 @@ class Downloader:
             # Fallback to current working directory or system PATH
             self.ffmpeg_path = None
 
+        # Optional cookies file (Netscape format) placed next to the executable.
+        # Required by YouTube for some videos/accounts once bot-verification kicks in.
+        cookies_file = os.path.join(base_path, "cookies.txt")
+        self.cookies_path = cookies_file if os.path.exists(cookies_file) else None
+
+    def _base_opts(self):
+        """Options shared by every yt-dlp call, tuned for YouTube's current
+        bot-verification and signature-cipher rollout."""
+        opts = {
+            # Try multiple player clients; if one gets blocked by YouTube's
+            # bot check or lacks a working signature cipher, fall back to the next.
+            'extractor_args': {
+                'youtube': {'player_client': ['android', 'web', 'tv']},
+            },
+            'retries': 10,
+            'fragment_retries': 10,
+            'nocheckcertificate': True,
+        }
+        if self.ffmpeg_path:
+            opts['ffmpeg_location'] = self.ffmpeg_path
+        if self.cookies_path:
+            opts['cookiefile'] = self.cookies_path
+        return opts
+
     def get_info(self, url):
         """Retrieves video information without downloading"""
-        ydl_opts = {}
-        if self.ffmpeg_path:
-            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
-            
+        ydl_opts = self._base_opts()
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return {
@@ -37,7 +59,8 @@ class Downloader:
 
     def download_mp3(self, url, progress_hooks=None):
         """Downloads audio and converts it to MP3"""
-        ydl_opts = {
+        ydl_opts = self._base_opts()
+        ydl_opts.update({
             'format': 'bestaudio/best',
             'noplaylist': True,
             'outtmpl': os.path.join(self.download_path, '%(title)s.%(ext)s'),
@@ -47,23 +70,20 @@ class Downloader:
                 'preferredquality': '192',
             }],
             'progress_hooks': progress_hooks or [],
-        }
-        if self.ffmpeg_path:
-            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
+        })
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
     def download_mp4(self, url, progress_hooks=None):
         """Downloads video and audio in MP4 format"""
-        ydl_opts = {
+        ydl_opts = self._base_opts()
+        ydl_opts.update({
             'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
             'noplaylist': True,
             'outtmpl': os.path.join(self.download_path, '%(title)s.%(ext)s'),
             'progress_hooks': progress_hooks or [],
-        }
-        if self.ffmpeg_path:
-            ydl_opts['ffmpeg_location'] = self.ffmpeg_path
+        })
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
