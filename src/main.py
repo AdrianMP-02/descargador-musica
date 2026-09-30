@@ -282,7 +282,9 @@ async def main(page: ft.Page):
     page.run_task(check_updates)
 
 if __name__ == "__main__":
+    # En Flet >= 1.0 `ft.app` fue eliminado; `ft.run` es su reemplazo.
+    run = getattr(ft, "run", None) or ft.app
     if os.getenv("FLET_WEB_MODE") == "1":
-        ft.app(main, view=ft.AppView.WEB_BROWSER, port=8550)
+        run(main, view=ft.AppView.WEB_BROWSER, port=8550)
     else:
-        ft.app(main)
+        run(main)
