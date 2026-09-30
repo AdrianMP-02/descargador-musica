@@ -1,4 +1,4 @@
-flet[all]
+flet[all]==0.28.3
 yt-dlp
 requests
 pyinstaller
